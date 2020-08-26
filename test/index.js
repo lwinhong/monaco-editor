@@ -179,98 +179,120 @@ function createButton(label, onClick) {
 function createOptions(editor) {
 	var options = document.getElementById('options');
 
+	var lineNumbers;
 	options.appendChild(createOptionToggle(
 		editor,
 		'lineNumbers',
-		function(config) {
-			return config.viewInfo.renderLineNumbers;
+		function() {
+			return (lineNumbers === false ? false : true);
 		},
 		function(editor, newValue) {
-			editor.updateOptions({ lineNumbers: newValue ? 'on': 'off' });
+			lineNumbers = newValue;
+			editor.updateOptions({ lineNumbers: lineNumbers ? 'on' : 'off' });
 		}
 	));
 
+	var glyphMargin;
 	options.appendChild(createOptionToggle(
 		editor,
 		'glyphMargin',
-		function(config) {
-			return config.viewInfo.glyphMargin;
+		function() {
+			return (glyphMargin === false ? false : true);
 		},
 		function(editor, newValue) {
-			editor.updateOptions({ glyphMargin: newValue });
+			glyphMargin = newValue;
+			editor.updateOptions({ glyphMargin: glyphMargin });
 		}
 	));
 
+	var minimap;
 	options.appendChild(createOptionToggle(
 		editor,
 		'minimap',
-		function(config) {
-			return config.viewInfo.minimap.enabled;
+		function() {
+			return (minimap === false ? false : true);
 		},
 		function(editor, newValue) {
-			editor.updateOptions({ minimap: { enabled: newValue } });
+			minimap = newValue;
+			editor.updateOptions({ minimap: { enabled: minimap } });
 		}
 	));
 
+	var roundedSelection;
 	options.appendChild(createOptionToggle(
 		editor,
 		'roundedSelection',
-		function(config) {
-			return config.viewInfo.roundedSelection;
+		function() {
+			return (roundedSelection === false ? false : true);
 		},
 		function(editor, newValue) {
-			editor.updateOptions({ roundedSelection: newValue });
+			roundedSelection = newValue;
+			editor.updateOptions({ roundedSelection: roundedSelection });
 		}
 	));
 
+	var scrollBeyondLastLine;
 	options.appendChild(createOptionToggle(
 		editor,
 		'scrollBeyondLastLine',
-		function(config) {
-			return config.viewInfo.scrollBeyondLastLine;
-		}, function(editor, newValue) {
-			editor.updateOptions({ scrollBeyondLastLine: newValue });
+		function() {
+			return (scrollBeyondLastLine === false ? false : true);
+		},
+		function(editor, newValue) {
+			scrollBeyondLastLine = newValue;
+			editor.updateOptions({ scrollBeyondLastLine: scrollBeyondLastLine });
 		}
 	));
 
+	var renderWhitespace;
 	options.appendChild(createOptionToggle(
 		editor,
 		'renderWhitespace',
-		function(config) {
-			return config.viewInfo.renderWhitespace;
-		}, function(editor, newValue) {
-			editor.updateOptions({ renderWhitespace: newValue });
+		function() {
+			return (renderWhitespace === true ? true : false);
+		},
+		function(editor, newValue) {
+			renderWhitespace = newValue;
+			editor.updateOptions({ renderWhitespace: renderWhitespace });
 		}
 	));
 
+	var readOnly;
 	options.appendChild(createOptionToggle(
 		editor,
 		'readOnly',
-		function(config) {
-			return config.readOnly;
+		function() {
+			return (readOnly === true ? true : false);
 		},
 		function(editor, newValue) {
-			editor.updateOptions({ readOnly: newValue });
+			readOnly = newValue;
+			editor.updateOptions({ readOnly: readOnly });
 		}
 	));
 
+	var wordWrap;
 	options.appendChild(createOptionToggle(
 		editor,
 		'wordWrap',
-		function(config) {
-			return config.wrappingInfo.isViewportWrapping;
-		}, function(editor, newValue) {
-			editor.updateOptions({ wordWrap: newValue ? 'on' : 'off' });
+		function() {
+			return (wordWrap === true ? true : false);
+		},
+		function(editor, newValue) {
+			wordWrap = newValue;
+			editor.updateOptions({ wordWrap: wordWrap ? 'on' : 'off' });
 		}
 	));
 
+	var folding;
 	options.appendChild(createOptionToggle(
 		editor,
 		'folding',
-		function(config) {
-			return config.contribInfo.folding;
-		}, function(editor, newValue) {
-			editor.updateOptions({ folding: newValue });
+		function() {
+			return (folding === false ? false : true);
+		},
+		function(editor, newValue) {
+			folding = newValue;
+			editor.updateOptions({ folding: folding });
 		}
 	));
 }
@@ -290,7 +312,7 @@ function createOptionToggle(editor, labelText, stateReader, setState) {
 	domNode.appendChild(label);
 
 	var renderState = function() {
-		input.checked = stateReader(editor.getConfiguration());
+		input.checked = stateReader();
 	};
 
 	renderState();
@@ -298,7 +320,7 @@ function createOptionToggle(editor, labelText, stateReader, setState) {
 		renderState();
 	});
 	input.onchange = function() {
-		setState(editor, !stateReader(editor.getConfiguration()));
+		setState(editor, !stateReader());
 	};
 
 	return domNode;

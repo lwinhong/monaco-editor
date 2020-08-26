@@ -23,7 +23,11 @@ You need to have all the build setup of VS Code to be able to build the Monaco E
 * Install all the [prerequisites](https://github.com/Microsoft/vscode/wiki/How-to-Contribute#prerequisites)
 
 ### OS X and Linux
-```
+
+```bash
+# clone vscode-loc repository for localized string resources
+/src> git clone https://github.com/microsoft/vscode-loc
+# clone VS Code repository
 /src> git clone https://github.com/microsoft/vscode
 /src> cd vscode
 # install npm deps for vscode
@@ -33,7 +37,11 @@ You need to have all the build setup of VS Code to be able to build the Monaco E
 ```
 
 ### Windows
-```
+
+```cmd
+# clone vscode-loc repository for localized string resources
+/src> git clone https://github.com/microsoft/vscode-loc
+# clone VS Code repository
 /src> git clone https://github.com/microsoft/vscode
 /src> cd vscode
 # install npm deps for vscode
@@ -92,16 +100,15 @@ Open [http://localhost:8080/monaco-editor/test/?editor=src&monaco-typescript=src
 # create a local release
 /src/monaco-editor> npm run release
 
-# open http://localhost:8080/monaco-editor/website/
-
 # build the website
 /src/monaco-editor> npm run build-website
+
+# start local webserver
+/src/monaco-editor> npm run simpleserver
 
 # open http://localhost:8080/monaco-editor-website/
 
 ```
-
----
 
 ## Shipping a new monaco-editor npm module
 

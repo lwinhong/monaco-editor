@@ -55,23 +55,25 @@
 	Component.prototype.isRelease = function() {
 		return /release/.test(this.selectedPath);
 	};
-	Component.prototype.getResolvedPath = function() {
+	Component.prototype.getResolvedPath = function(PATH_PREFIX) {
 		let resolvedPath = this.paths[this.selectedPath];
 		if (this.selectedPath === 'npm/dev' || this.selectedPath === 'npm/min' || this.isRelease()) {
 			if (IS_FILE_PROTOCOL) {
 				resolvedPath = DIRNAME + '/../' + resolvedPath;
 			} else {
-				resolvedPath = '/monaco-editor/' + resolvedPath;
+				resolvedPath = PATH_PREFIX + '/monaco-editor/' + resolvedPath;
 			}
 		} else {
 			if (IS_FILE_PROTOCOL) {
 				resolvedPath = DIRNAME + '/../..' + resolvedPath;
+			} else {
+				resolvedPath = PATH_PREFIX + resolvedPath;
 			}
 		}
 		return resolvedPath;
 	};
-	Component.prototype.generateLoaderConfig = function(dest) {
-		dest[this.modulePrefix] = this.getResolvedPath();
+	Component.prototype.generateLoaderConfig = function(dest, PATH_PREFIX) {
+		dest[this.modulePrefix] = this.getResolvedPath(PATH_PREFIX);
 	};
 	Component.prototype.generateUrlForPath = function(pathName) {
 		let NEW_LOADER_OPTS = {};
@@ -86,24 +88,24 @@
 				return key + '=' + value;
 			}
 			return '';
-		}).filter(function(assignment) { return !!assignment; }).join('&');
+		}).filter(function(assignment) { return !!assignment; }).join('&amp;');
 		if (search.length > 0) {
 			search = '?' + search;
 		}
 		return toHREF(search);
 	};
 	Component.prototype.renderLoadingOptions = function() {
-		return '<strong style="width:130px;display:inline-block;">' + this.name + '</strong>:&nbsp;&nbsp;&nbsp;' + Object.keys(this.paths).map(function(pathName) {
+		return '<strong style="width:130px;display:inline-block;">' + this.name + '</strong>:&#160;&#160;&#160;' + Object.keys(this.paths).map(function(pathName) {
 			if (pathName === this.selectedPath) {
 				return '<strong>' + pathName + '</strong>';
 			}
 			return '<a href="' + this.generateUrlForPath(pathName) + '">' + pathName + '</a>';
-		}.bind(this)).join('&nbsp;&nbsp;&nbsp;');
+		}.bind(this)).join('&#160;&#160;&#160;');
 	};
 
 
 	let RESOLVED_CORE = new Component('editor', 'vs', METADATA.CORE.paths);
-	self.RESOLVED_CORE_PATH = RESOLVED_CORE.getResolvedPath();
+	self.RESOLVED_CORE_PATH = RESOLVED_CORE.getResolvedPath('');
 	let RESOLVED_PLUGINS = METADATA.PLUGINS.map(function(plugin) {
 		return new Component(plugin.name, plugin.modulePrefix, plugin.paths, plugin.contrib);
 	});
@@ -147,24 +149,35 @@
 		}
 	})();
 
+	self.getCodiconPath = function(PATH_PREFIX) {
+		PATH_PREFIX = PATH_PREFIX || '';
+		const result = RESOLVED_CORE.getResolvedPath(PATH_PREFIX);
+		return result + '/base/browser/ui/codiconLabel/codicon/codicon.ttf';
+	};
+
 
 	self.loadEditor = function(callback, PATH_PREFIX) {
 		PATH_PREFIX = PATH_PREFIX || '';
 
-		loadScript(PATH_PREFIX + RESOLVED_CORE.getResolvedPath() + '/loader.js', function() {
+		loadScript(RESOLVED_CORE.getResolvedPath(PATH_PREFIX) + '/loader.js', function() {
 			let loaderPathsConfig = {};
 			if (!RESOLVED_CORE.isRelease()) {
 				RESOLVED_PLUGINS.forEach(function(plugin) {
-					plugin.generateLoaderConfig(loaderPathsConfig);
+					plugin.generateLoaderConfig(loaderPathsConfig, PATH_PREFIX);
 				});
 			}
-			RESOLVED_CORE.generateLoaderConfig(loaderPathsConfig);
+			RESOLVED_CORE.generateLoaderConfig(loaderPathsConfig, PATH_PREFIX);
 
 			console.log('LOADER CONFIG: ');
 			console.log(JSON.stringify(loaderPathsConfig, null, '\t'));
 
 			require.config({
-				paths: loaderPathsConfig
+				paths: loaderPathsConfig,
+				// 'vs/nls' : {
+				// 	availableLanguages: {
+				// 		'*': 'de'
+				// 	}
+				// }
 			});
 
 			require(['vs/editor/editor.main'], function() {
